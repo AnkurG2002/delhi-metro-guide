@@ -104,6 +104,9 @@ void dijkstra(vector<vector<int>> &graph, int source, int destination, vector<st
 {
 	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
 	vector<int> distance(n, INT_MAX);
+	vector<int> parent(n);
+	for (int i = 0; i < n; i++)
+		parent[i] = i;
 
 	pq.push({0, source});
 	distance[source] = 0;
@@ -120,12 +123,32 @@ void dijkstra(vector<vector<int>> &graph, int source, int destination, vector<st
 				if (distance[u] + 1 < distance[v])
 				{
 					distance[v] = distance[u] + 1;
+					parent[v] = u;
 					pq.push({distance[v], v});
 				}
 			}
 		}
 	}
 	cout << "Minimum Number of Stations from " << stations[source] << " To " << stations[destination] << " is " << distance[destination] << endl;
+
+	vector<int> path;
+	int index = destination;
+
+	while (parent[index] != index)
+	{
+		path.push_back(index);
+		index = parent[index];
+	}
+	path.push_back(index);
+
+	cout << "\nPath : ";
+	for (int i = path.size() - 1; i >= 0; i--)
+	{
+		if (i > 0)
+			cout << path[i] << "->";
+		else
+			cout << path[i];
+	}
 }
 
 vector<string> suggestedProducts(string searchWord)
