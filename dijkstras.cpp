@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <fstream>
 #include <climits>
 
@@ -12,7 +13,6 @@ using namespace std;
 Trie *t = new Trie();
 int n;
 
-int mindistance(vector<int> &distance, vector<bool> &visited);
 void dijkstra(vector<vector<int>> &graph, int source, int destination, vector<string> &stations);
 vector<string> suggestedProducts(string searchWord);
 void getStationsList(vector<string> &stations);
@@ -100,33 +100,29 @@ int main()
 	return 0;
 }
 
-int mindistance(vector<int> &distance, vector<bool> &visited)
-{
-	int minimum = INT_MAX, ind;
-	for (int i = 0; i < n; i++)
-	{
-		if (visited[i] == false && distance[i] <= minimum)
-		{
-			minimum = distance[i];
-			ind = i;
-		}
-	}
-	return ind;
-}
 void dijkstra(vector<vector<int>> &graph, int source, int destination, vector<string> &stations)
 {
+	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
 	vector<int> distance(n, INT_MAX);
-	vector<bool> visited(n, false);
 
+	pq.push({0, source});
 	distance[source] = 0;
-	for (int i = 0; i < n; i++)
+
+	while (!pq.empty())
 	{
-		int m = mindistance(distance, visited);
-		visited[m] = true;
-		for (int j = 0; j < n; j++)
+		int u = pq.top().second;
+		pq.pop();
+
+		for (int v = 0; v < n; v++)
 		{
-			if (!visited[j] && graph[m][j] && distance[m] != INT_MAX && distance[m] + graph[m][j] < distance[j])
-				distance[j] = distance[m] + graph[m][j];
+			if (graph[u][v] == 1)
+			{
+				if (distance[u] + 1 < distance[v])
+				{
+					distance[v] = distance[u] + 1;
+					pq.push({distance[v], v});
+				}
+			}
 		}
 	}
 	cout << "Minimum Number of Stations from " << stations[source] << " To " << stations[destination] << " is " << distance[destination] << endl;
